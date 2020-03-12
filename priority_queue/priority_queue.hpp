@@ -7,10 +7,6 @@
 
 namespace dslib
 {
-	//New.hpp
-	template <class T>
-	T *New() {return reinterpret_cast<T *>(::operator new(sizeof (T)));}
-
 	//Priority_Queue.hpp
 	template <class valueType , class compare = std::less<valueType> >
 	class PriorityQueue
@@ -38,6 +34,9 @@ namespace dslib
 			size_t tot , d;
 			valueType val;
 			Node *left , *right;
+
+			Node(){}
+			Node(const valueType &val_) : val(val_) {}
 		}*root;
 
 		Node *merge(Node * const & , Node * const &);
@@ -87,8 +86,8 @@ namespace dslib
 	template <class valueType , class compare>
 	void LeftistTree<valueType , compare>::push(const valueType &val)
 	{
-		LeftistTree<valueType , compare> tmp(New<Node>());
-		tmp.root -> tot = 1 , tmp.root -> d = 0 , tmp.root -> val = val , tmp.root -> left = tmp.root -> right = nullptr;
+		LeftistTree<valueType , compare> tmp(new Node (val));
+		tmp.root -> tot = 1 , tmp.root -> d = 0 , tmp.root -> left = tmp.root -> right = nullptr;
 		join(tmp);
 	}
 
@@ -124,7 +123,7 @@ namespace dslib
 	typename LeftistTree<valueType , compare>::Node *LeftistTree<valueType , compare>::copy(const typename LeftistTree<valueType , compare>::Node * const &rt)
 	{
 		if (rt == nullptr) return nullptr;
-		Node *ret = New<Node>();ret -> val = rt -> val , ret -> tot = rt -> tot , ret -> d = rt -> d;
+		Node *ret = new Node (rt -> val);ret -> tot = rt -> tot , ret -> d = rt -> d;
 		ret -> left = copy(rt -> left) , ret -> right = copy(rt -> right);
 		return ret;
 	}
