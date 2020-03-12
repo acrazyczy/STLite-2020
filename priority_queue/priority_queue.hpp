@@ -35,7 +35,6 @@ namespace dslib
 			valueType val;
 			Node *left , *right;
 
-			Node(){}
 			Node(const valueType &val_) : val(val_) {}
 		}*root;
 
@@ -123,7 +122,8 @@ namespace dslib
 	typename LeftistTree<valueType , compare>::Node *LeftistTree<valueType , compare>::copy(const typename LeftistTree<valueType , compare>::Node * const &rt)
 	{
 		if (rt == nullptr) return nullptr;
-		Node *ret = new Node (rt -> val);ret -> tot = rt -> tot , ret -> d = rt -> d;
+		Node *ret = new Node (rt -> val);
+		ret -> tot = rt -> tot , ret -> d = rt -> d;
 		ret -> left = copy(rt -> left) , ret -> right = copy(rt -> right);
 		return ret;
 	}
@@ -158,7 +158,11 @@ public:
 	/**
 	 * TODO Assignment operator
 	 */
-	priority_queue &operator=(const priority_queue &other) {p_queue = other.p_queue;}
+	priority_queue &operator=(const priority_queue &other)
+	{
+		p_queue = other.p_queue;
+		return *this;
+	}
 	/**
 	 * get the top of the queue.
 	 * @return a reference of the top element.
