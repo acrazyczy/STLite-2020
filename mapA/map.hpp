@@ -10,14 +10,13 @@
 #include "utility.hpp"
 #include "exceptions.hpp"
 
+namespace sjtu {
 template <class T>
 void swap(T &x , T &y)
 {
 	T z(x);
 	x = y , y = z;
 }
-
-namespace sjtu {
 
 template<
 	class Key,
@@ -143,37 +142,41 @@ private:
 		x -> color = BLACK;
 	}
 
-	Node *findmin(Node * const node) const
+	Node *findmin(const Node * const node) const
 	{
-		Node *x = node;
+		Node *x = const_cast<Node *>(node);
 		for (;x -> left != nil;x = x -> left);
 		return x;
 	}
 
-	Node *findmax(Node * const node) const
+	Node *findmax(const Node * const node) const
 	{
-		Node *x = node;
+		Node *x = const_cast<Node *>(node);
 		for (;x -> right != nil;x = x -> right);
 		return x;
 	}
 
-	Node *prec(const Node * node) const
+	Node *prec(const Node * const node) const
 	{
 		Node *x = const_cast<Node *>(node);
-		for (;x -> left == nil && x != nil;x = x -> parent);
-		if (x == nil) throw(invalid_iterator());
-		x = x -> left;
-		for (;x -> right != nil;x = x -> right);
+		if (x -> left == nil)
+		{
+			for (;x != nil && x -> parent -> left == x;x = x -> parent);
+			if (x == nil) throw(invalid_iterator());
+			x = x -> parent;
+		}else x = findmax(x -> left);
 		return x;
 	}
 
 	Node *succ(const Node * node) const
 	{
 		Node *x = const_cast<Node *>(node);
-		for (;x -> right == nil && x != nil;x = x -> parent);
-		if (x == nil) throw(invalid_iterator());
-		x = x -> right;
-		for (;x -> left != nil;x = x -> left);
+		if (x -> right == nil)
+		{
+			if (x == nil) throw(invalid_iterator());
+			for (;x != nil && x -> parent -> right == x;x = x -> parent);
+			x = x -> parent;
+		}else x = findmin(x -> right);
 		return x;
 	}
 
@@ -198,7 +201,7 @@ private:
 		if (y == nil || compare(node -> value -> first , y -> value -> first)) y -> left = node;
 		else y -> right = node;
 		node -> left = node -> right = nil , node -> parent = y;
-		++ tot , insert_fixup(x) , nil -> parent = nil , nodebegin = findmin(nil);
+		++ tot , insert_fixup(node) , nil -> parent = nil , nodebegin = findmin(nil);
 	}
 
 	void erase(Node *x)
@@ -226,17 +229,18 @@ private:
 	Node *copy(Node *x , Node * const &nilx , Node * const &nily)
 	{
 		if (x == nilx) return nily;
-		Node *y = new Node (*x);
-		y -> left = copy(x -> left , nilx , nily) , y -> right = copy(x -> right , nilx , nily);
+		Node *y = new Node (*x);++ tot;
+		y -> left = copy(x -> left , nilx , nily) , y -> right = copy(x -> right , nilx , nily) , y -> parent = nil;
 		if (y -> left != nily) y -> left -> parent = y;
 		if (y -> right != nily) y -> right -> parent = y;
+		return y;
 	}
 
 	void clear(Node *&x)
 	{
 		if (x == nil) return;
 		if (x -> parent == nil) nodebegin = nil;
-		clear(x -> left) , clear(x -> right) , delete x , x = nil;
+		clear(x -> left) , clear(x -> right) , delete x , x = nil , -- tot;
 	}
 public:
 	/**
@@ -272,8 +276,9 @@ public:
 		 */
 		iterator operator++(int)
 		{
-			Node *ptr_ = cor -> succ(ptr);
-			return iterator(cor , ptr_);
+			iterator ret(*this);
+			ptr = cor -> succ(ptr);
+			return ret;
 		}
 		/**
 		 * TODO ++iter
@@ -288,8 +293,9 @@ public:
 		 */
 		iterator operator--(int)
 		{
-			Node *ptr_ = cor -> prec(ptr);
-			return iterator(cor , ptr_);
+			iterator ret(*this);
+			ptr = cor -> prec(ptr);
+			return ret;
 		}
 		/**
 		 * TODO --iter
@@ -330,12 +336,13 @@ public:
 
 		const_iterator(const const_iterator &other) : cor(other.cor) , ptr(other.ptr) {}
 
-		explicit const_iterator(const iterator &other) : cor(other.cor) , ptr(other.ptr) {}
+		const_iterator(const iterator &other) : cor(other.cor) , ptr(other.ptr) {}
 
 		const_iterator operator++(int)
 		{
-			const Node *ptr_ = cor -> succ(ptr);
-			return const_iterator(cor , ptr_);
+			const_iterator ret(*this);
+			ptr = cor -> succ(ptr);
+			return ret;
 		}
 
 		const_iterator & operator++()
@@ -346,8 +353,9 @@ public:
 
 		const_iterator operator--(int)
 		{
-			const Node *ptr_ = cor -> prec(ptr);
-			return const_iterator(cor , ptr_);
+			const_iterator ret(*this);
+			ptr = cor -> prec(ptr);
+			return ret;
 		}
 
 		const_iterator & operator--()
@@ -373,9 +381,9 @@ public:
 
 	map(const map &other)
 	{
-		nil = new Node , nil -> parent = nil -> right = nil;
+		nil = new Node , nil -> parent = nil -> right = nil , tot = 0;
 		nil -> left = copy(other.nil -> left , other.nil , nil);
-		tot = other.tot , nodebegin = findmin(nil);
+		nodebegin = findmin(nil);
 	}
 	/**
 	 * TODO assignment operator
@@ -384,7 +392,7 @@ public:
 	{
 		if (&other == this) return *this;
 		clear(nil -> left) , nil -> left = copy(other.nil -> left , other.nil , nil);
-		tot = other.tot , nodebegin = findmin(nil);
+		nodebegin = findmin(nil);
 		return *this;
 	}
 	/**
@@ -444,7 +452,7 @@ public:
 	/**
 	 * clears the contents
 	 */
-	void clear() {clear(nil -> left) , tot = 0;}
+	void clear() {clear(nil -> left);}
 	/**
 	 * insert an element.
 	 * return a pair, the first of the pair is

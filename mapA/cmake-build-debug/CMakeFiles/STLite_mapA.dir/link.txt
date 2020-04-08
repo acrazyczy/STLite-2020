@@ -1,1 +1,0 @@
-/usr/bin/c++    -g -g   CMakeFiles/STLite_mapA.dir/code.cpp.o  -o STLite_mapA 

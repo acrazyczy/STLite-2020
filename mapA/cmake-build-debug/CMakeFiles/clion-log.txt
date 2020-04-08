@@ -1,4 +1,0 @@
-/usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" "/mnt/d/Academy/OIACM/Code/Homework/STL Homework/STLite-2020/mapA"
--- Configuring done
--- Generating done
--- Build files have been written to: /mnt/d/Academy/OIACM/Code/Homework/STL Homework/STLite-2020/mapA/cmake-build-debug
