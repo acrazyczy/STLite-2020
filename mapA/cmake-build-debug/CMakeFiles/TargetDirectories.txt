@@ -1,0 +1,3 @@
+/mnt/d/Academy/OIACM/Code/Homework/STL Homework/STLite-2020/mapA/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/mnt/d/Academy/OIACM/Code/Homework/STL Homework/STLite-2020/mapA/cmake-build-debug/CMakeFiles/STLite_mapA.dir
+/mnt/d/Academy/OIACM/Code/Homework/STL Homework/STLite-2020/mapA/cmake-build-debug/CMakeFiles/edit_cache.dir
