@@ -1,0 +1,1 @@
+/usr/bin/c++    -g -Wall -Wshadow -Wextra -g   CMakeFiles/STLite_deque.dir/code.cpp.o  -o STLite_deque 
